@@ -3,7 +3,7 @@
 
 This repository contains the code for the practical assignemnt task of the IU Course "Programming with Python"
 
-### Task Definition
+### Given Input
 
 The following data inputs are given:  
 1. Training Dataset: train.csv  
@@ -12,6 +12,8 @@ The training dataset consists of one x-column and 4 y-columns and contains scatt
 The ideal functions dataset consists of one x-column and 50 y-columns and represents 50 mathematical functions.
 3. Test Dataset: test.csv  
 The test dataset consists of one x-column and one y-column and holds random (observed) data.
+
+### Task Definition
 
 The task is to write Python program executing the following tasks:  
 1. Out of the 50 functions given, find the four functions that that fit each y-value of the training data best. The mapping criterion is the smallest sum of all y-deviations squared (Least-Square). The found functions are further called 'ideal functions'.
