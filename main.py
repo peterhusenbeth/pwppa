@@ -1,29 +1,66 @@
-train_file = open("./Datasets1/train.csv", "r")
-ideal_file = open("./Datasets1/ideal.csv", "r")
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
 
-def csv_to_list(file, separator, convert_func):
-    next(file)
-    list = []
+def get_estimators(df, independent_variable):
+    # for every dependent column of the input DataFrame this function returns an estimator in a list
 
-    for line in file:
-        row = line[:len(line)-1].split(separator)
-        converted_row = []
+    i = 0
+    estimators = []
+    lr = LinearRegression()
 
-        for value in row:
-            converted_row.append(convert_func(value))
+    for column_index in df.axes[1]:
+        if column_index == independent_variable:
 
-        list.append(converted_row)
+            x = df.iloc[:, i].values.reshape(-1, 1)
+
+        else:
+
+            y = df.iloc[:, i].values.reshape(-1, 1)
+
+            estimators.append(lr.fit(x, y))
+
+        i += 1
+
+    return estimators
     
-    return list
+
+def main():
+    df_train = pd.read_csv(filepath_or_buffer="Datasets1/train.csv")
+    x_train = df_train.iloc[:, 0].values.reshape(-1, 1)
+    y1_itrain = df_train.iloc[:, 1].values.reshape(-1, 1)
 
 
-train_data = csv_to_list(train_file, ",", float)
-ideal_data = csv_to_list(ideal_file, ",", float)
+    df_ideal = pd.read_csv(filepath_or_buffer="Datasets1/ideal.csv")
+    x_ideal = df_ideal.iloc[:, 0].values.reshape(-1, 1)
+    y1_ideal = df_ideal.iloc[:, 1].values.reshape(-1, 1)
 
-print(train_data[33][2])
-print(ideal_data[33][2])
+    # print(df_ideal.iloc[:, :])
+    # print(df_ideal.axes[1].__iter__)
+
+    # step 1
+    # get estimator for every of the 50 functions (--> array or list with all the estimators)
+    ideal_estimators = get_estimators(df_ideal, 'x')
+
+    # input x values from training data into estimators
+
+    # calculate deviation (Least-Square) of train x,y and ideal x,y
+
+    # get the lowest deviation and save the index no of the ideal function it came from
 
 
 
-#for item in train_data:
-#    print(f"{item!r}")
+
+
+
+
+
+
+    # plot this shit
+    # plt.scatter(x_ideal, y1_ideal)
+    # plt.plot(x_ideal, y1_func, color='red')
+    # plt.show()
+
+if __name__ == '__main__':
+    main()
