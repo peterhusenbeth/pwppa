@@ -16,7 +16,7 @@ The test dataset consists of one x-column and one y-column and holds random (obs
 ### Task Definition
 
 The task is to write Python program executing the following tasks:  
-1. Out of the 50 functions given, find the four functions that that fit each y-value of the training data best. The mapping criterion is the smallest sum of all y-deviations squared (Least-Square). The found functions are further called 'ideal functions'.
+1. Out of the 50 functions given, find the four functions that that fit each set of y-values of the training data best. The mapping criterion is the smallest sum of all y-deviations squared (Least-Square). The found functions are further called 'ideal functions'.
 2. The next step is to check whether the test data fits into the deviation range of the training data. They are to be considered inside deviation range if the deviation of test datapoint to the ideal function does not exceed the largest deviation between training dataset and the ideal function chosen for it by more than factor sqrt(2). If the test datapoint fits into this criteria, the datapoint, corresponding function and deviation from it are to be added to the test database table.
 
 So the expected output is a table of the following four columns:  
