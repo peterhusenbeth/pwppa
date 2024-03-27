@@ -33,7 +33,7 @@ def map_deviations(df_from_x: pd.DataFrame, df_from_y: pd.DataFrame, df_to_x: pd
 
         df_deviations.loc[len(df_deviations.index)] = row
 
-    return df_deviations
+    return df_deviations, estimators
 
 def get_estimators(df_x: pd.DataFrame, df_y: pd.DataFrame):
     # for every dependent column of the input DataFrame this function returns an estimator in a list
@@ -62,24 +62,38 @@ def square_deviation(x_data: pd.Series, y_data: pd.Series, function: LinearRegre
     y_column = np.array(y_data).reshape(-1, 1)
     y_estimated = function.predict(np.array(x_data).reshape(-1, 1))
 
-    print("y_column, y_estimated, differenz")
-    print(y_column[0], y_estimated[0], y_column[0] - y_estimated[0])
-
     return np.float64(sum((y_column - y_estimated)**2))
 
 def main():
+    # read CSV files into DataFrames
     df_train = pd.read_csv(filepath_or_buffer="pwppa/Datasets1/train.csv")
     df_ideal = pd.read_csv(filepath_or_buffer="pwppa/Datasets1/ideal.csv")
 
-    map_dev = map_deviations(df_train.iloc[:, 0], df_train.iloc[:, 1:5], df_ideal.iloc[:, 0], df_ideal.iloc[:, 1:51])
+    # create table of square deviations from training data to ideal functions
+    map_dev, estimators = map_deviations(df_train.iloc[:, 0], df_train.iloc[:, 1:5], df_ideal.iloc[:, 0], df_ideal.iloc[:, 1:51])
 
-    print("map_deviations: ")
-    print(map_dev)
-    #print(get_estimators(df_ideal))
+    # print("map_deviations split: ")
+    # print(map_dev)
 
-    #print(df_train.columns)
-    #print(df_train.columns[1:].insert(0, 'ideal_func_no'))
-    #print(["ideal_func_no"].append(df_train.columns[1:]))
+    # sort each column ascending
+    for column in map_dev.columns:
+        if column != 'func_nr':
+
+            ideal_func_nr = map_dev[['func_nr', column]].sort_values(by=column).iloc[0, 0]
+
+            x_values = np.array(df_train['x']).reshape(-1, 1)
+            
+            # add data to plot
+            plt.scatter(x_values, df_train[column], label = column)
+
+            # add ideal function line to plot
+            plt.plot(x_values, estimators[ideal_func_nr - 1].predict(x_values), color='black', label = 'func_nr: ' + str(ideal_func_nr))
+    
+    # enhance and show plot 
+    plt.xlabel('x')
+    plt.xlabel('y')
+    plt.legend()
+    plt.show()
 
     # OO Approach
     # class ideal function inherits from LinearRegression
