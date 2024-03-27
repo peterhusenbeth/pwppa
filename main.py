@@ -3,7 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 
-def map_deviations(df_from_x: pd.DataFrame, df_from_y: pd.DataFrame, estimators: list[LinearRegression]):
+# rewrite for only one training function at a time. return: Dataframe with columns: func_nr, estimator, square_dev, largest_dev
+def get_deviations(df_from_x: pd.DataFrame, df_from_y: pd.DataFrame, estimators: list[LinearRegression]):
     # input x values from training data into estimators
     # calculate deviation (Least-Square) of train x,y and ideal x,y
 
@@ -65,45 +66,43 @@ def deviations(x_data: pd.Series, y_data: pd.Series, function: LinearRegression)
 
 def main():
     # read CSV files into DataFrames
-    df_train = pd.read_csv(filepath_or_buffer="pwppa/Datasets1/train.csv")
-    df_ideal = pd.read_csv(filepath_or_buffer="pwppa/Datasets1/ideal.csv")
-    df_test = pd.read_csv(filepath_or_buffer="pwppa/Datasets1/test.csv")
+    df_train = pd.read_csv(filepath_or_buffer="Datasets1/train.csv")
+    df_ideal = pd.read_csv(filepath_or_buffer="Datasets1/ideal.csv")
+    df_test = pd.read_csv(filepath_or_buffer="Datasets1/test.csv")
 
     # first step of the program
     # create table of square deviations from training data to ideal functions
     estimators = get_estimators(df_ideal.iloc[:, 0], df_ideal.iloc[:, 1:51])
 
+    mapped_deviations = []
+
     for column in df_train.columns:
 
         if column != 'x':
+            
+            # get all the deviations for current column
+            deviation_mapping = get_deviations(df_train['x'], df_train[column], estimators).sort_values(by = 'sqr_deviation')
 
-            map_dev = map_deviations(df_train['x'], df_train[column], estimators)
+            # save deviations-table in list for use after for loop
+            mapped_deviations.append(deviation_mapping)
 
-            print("map_deviations split: ")
-            print(map_dev)
+            # save the top row since this is the one with the least square deviation
+            ideal_row = deviation_mapping.iloc[0]
 
-
-    '''
-    # sort each column ascending
-    for column in map_dev.columns:
-        if column != 'func_nr':
-
-            ideal_func_nr = map_dev[['func_nr', column]].sort_values(by=column).iloc[0, 0]
-
+            # convert x-values of training data to np.arra() for further calculation steps
             x_values = np.array(df_train['x']).reshape(-1, 1)
             
-            # add data to plot
+            # add training data to plot
             plt.scatter(x_values, df_train[column], label = column)
 
             # add ideal function line to plot
-            plt.plot(x_values, estimators[ideal_func_nr - 1].predict(x_values), color='black', label = 'func_nr: ' + str(ideal_func_nr))
+            plt.plot(x_values, ideal_row['estimator'].predict(x_values), color='black', label = 'func_nr: ' + str(ideal_row['func_nr']))
     
     # enhance and show plot 
     plt.xlabel('x')
     plt.xlabel('y')
     plt.legend()
     plt.show()
-    '''
 
     # second step of the program
     # determine the largest deviation between training dataset and corresponding ideal function
