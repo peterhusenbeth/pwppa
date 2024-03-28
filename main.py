@@ -66,15 +66,17 @@ def deviations(x_data: pd.Series, y_data: pd.Series, function: LinearRegression)
 
 def main():
     # read CSV files into DataFrames
-    df_train = pd.read_csv(filepath_or_buffer="Datasets1/train.csv")
-    df_ideal = pd.read_csv(filepath_or_buffer="Datasets1/ideal.csv")
-    df_test = pd.read_csv(filepath_or_buffer="Datasets1/test.csv")
+    df_train = pd.read_csv(filepath_or_buffer="/Users/pete/Documents/python/pwppa/Datasets1/train.csv")
+    df_ideal = pd.read_csv(filepath_or_buffer="/Users/pete/Documents/python/pwppa/Datasets1/ideal.csv")
+    df_test = pd.read_csv(filepath_or_buffer="/Users/pete/Documents/python/pwppa/Datasets1/test.csv")
 
     # first step of the program
     # create table of square deviations from training data to ideal functions
     estimators = get_estimators(df_ideal.iloc[:, 0], df_ideal.iloc[:, 1:51])
 
-    mapped_deviations = []
+    train_ideal_mapping = pd.DataFrame(columns=['train_nr', 'func_nr', 'estimator', 'sqr_deviation', 'max_deviation'])
+
+    i = 0
 
     for column in df_train.columns:
 
@@ -83,11 +85,11 @@ def main():
             # get all the deviations for current column
             deviation_mapping = get_deviations(df_train['x'], df_train[column], estimators).sort_values(by = 'sqr_deviation')
 
-            # save deviations-table in list for use after for loop
-            mapped_deviations.append(deviation_mapping)
-
             # save the top row since this is the one with the least square deviation
             ideal_row = deviation_mapping.iloc[0]
+
+            # save deviations in table for use after for loop
+            train_ideal_mapping.loc[i] = {'train_nr': column, 'func_nr': ideal_row['func_nr'], 'estimator': ideal_row['estimator'], 'sqr_deviation': ideal_row['sqr_deviation'], 'max_deviation': ideal_row['max_deviation']}
 
             # convert x-values of training data to np.arra() for further calculation steps
             x_values = np.array(df_train['x']).reshape(-1, 1)
@@ -97,23 +99,52 @@ def main():
 
             # add ideal function line to plot
             plt.plot(x_values, ideal_row['estimator'].predict(x_values), color='black', label = 'func_nr: ' + str(ideal_row['func_nr']))
-    
+        
+            i += 1
+
+    '''
     # enhance and show plot 
     plt.xlabel('x')
     plt.xlabel('y')
     plt.legend()
     plt.show()
+    '''
 
     # second step of the program
     # determine the largest deviation between training dataset and corresponding ideal function
 
+
+    
     # check every test datapoint
-    # for index, row in df_test.iterrows():
+    for index, datapoint in df_test.iterrows():
+
+        for index, mapping in train_ideal_mapping.iterrows():
+
+            # calculate functions estimated y
+            y_predicted = np.float64(mapping['estimator'].predict(np.array(datapoint['x']).reshape(-1, 1)))
+
+            # calculate difference to test datapoint
+            y_diff = datapoint['y'] - y_predicted
+
+            if y_diff <= deviation_mapping['max_deviation'] * np.sqrt(2):
+
+                # do whats necessary
         
+        break
+
+    print("test dataset")
+    print(df_test)
 
 
+    '''
 
+    for index, datapoint in df_test.iterrows():
+        print('datapoint[x]')
+        print(datapoint['x'])
+        print('datapoint[y]')
+        print(datapoint['y'])
 
+    '''
 
 
 
