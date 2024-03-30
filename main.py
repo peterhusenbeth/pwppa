@@ -101,39 +101,66 @@ def main():
             plt.plot(x_values, ideal_row['estimator'].predict(x_values), color='black', label = 'func_nr: ' + str(ideal_row['func_nr']))
         
             i += 1
+    
 
-    '''
+    # second step of the program
+    # determine the largest deviation between training dataset and corresponding ideal function
+
+    df_test.insert(2, 'func_nr', None)
+    df_test.insert(3, 'deviation', None)
+    train_ideal_mapping.insert(5, 'test_data', None)
+
+    i = 0
+
+    # check every test datapoint
+    for test_index, datapoint in df_test.iterrows():
+
+        # check every ideal function
+        for mapping_index, mapping in train_ideal_mapping.iterrows():
+
+            # calculate functions estimated y value
+            y_predicted = np.float64(mapping['estimator'].predict(np.array(datapoint['x']).reshape(-1, 1)))
+
+            # calculate deviation from estimated y-value to test datapoint
+            y_dev = np.abs(datapoint['y'] - y_predicted)
+
+            # check if datapoint is in deviation range
+            if y_dev <= (mapping['max_deviation'] * np.sqrt(2)):
+
+                if df_test.loc[test_index, 'deviation'] is None or y_dev < df_test.loc[test_index, 'deviation']:
+
+                    # add ideal func_nr and deviation from it to test database table
+                    df_test.loc[test_index, 'func_nr'] = mapping['func_nr']
+                    df_test.loc[test_index, 'deviation'] = y_dev
+
+                    # add found test datapoint and corresponding deviation to the ideal function mapping table
+                    new_test_data = [pd.Series([datapoint['x'], datapoint['y'], y_dev])]
+
+                    if train_ideal_mapping.at[mapping_index, 'test_data'] is None:
+                        train_ideal_mapping.at[mapping_index, 'test_data'] = new_test_data
+                    else:
+                        train_ideal_mapping.at[mapping_index, 'test_data'].append(new_test_data)
+            
+            if df_test.loc[test_index, 'func_nr'] is None:
+
+                # visualize non-fitting datapoint in green
+                plt.scatter(datapoint['x'], datapoint['y'], color = 'red')
+            
+            else:
+                
+                # visualize fitting datapoint in green
+                plt.scatter(datapoint['x'], datapoint['y'], color = 'green')
+
+
+    print("enhanced test dataset")
+    print(df_test)
+
+    
     # enhance and show plot 
     plt.xlabel('x')
     plt.xlabel('y')
     plt.legend()
     plt.show()
-    '''
-
-    # second step of the program
-    # determine the largest deviation between training dataset and corresponding ideal function
-
-
-    
-    # check every test datapoint
-    for index, datapoint in df_test.iterrows():
-
-        for index, mapping in train_ideal_mapping.iterrows():
-
-            # calculate functions estimated y
-            y_predicted = np.float64(mapping['estimator'].predict(np.array(datapoint['x']).reshape(-1, 1)))
-
-            # calculate difference to test datapoint
-            y_diff = datapoint['y'] - y_predicted
-
-            if y_diff <= deviation_mapping['max_deviation'] * np.sqrt(2):
-
-                # do whats necessary
-        
-        break
-
-    print("test dataset")
-    print(df_test)
 
 
     '''
