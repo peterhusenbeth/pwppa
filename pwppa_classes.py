@@ -1,41 +1,37 @@
 import numpy as np
 import pandas as pd
-from sklearn.base import BaseEstimator
-from sqlalchemy import create_engine, Column, Integer, String, Double, ForeignKey
+from sqlalchemy import Column, Integer, String, Double, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 
-Base = declarative_base()
+# get the SQLAlchemy ORM base class for mapping instances to table entries
+Declarative_Base = declarative_base()
 
-class Function(Base):
-    __tablename__ = 'functions'
+class Train_Ideal_Mapping(Declarative_Base):
+    '''
+    Object-Relational-Mapper-Class to map the functions to the training data
+    '''
+    __tablename__ = 'output_train_ideal_mapping'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String(3))
-
-class Training_Data(Base):
-    __tablename__ = 'training_data'
-
-    id = Column(Integer, primary_key=True)
-    name = Column(String(3))
-
-    def find_ideal_function(functions):
-        return 0
-
-class Mapping(Base):
-    __tablename__ = 'train_ideal_mapping'
-
-    id = Column(Integer, primary_key=True)
-    training_data_id = Column(Integer, ForeignKey('training_data.id'))
-    function_id = Column(Integer, ForeignKey('functions.id'))
+    training_data = Column(String(3), primary_key=True)
+    function = Column(String(3), primary_key=True)
+    function_index = Column(Integer)
     sqr_deviation = Column(Double)
     max_deviation = Column(Double)
+    test_data = Column(String(10000))
 
-class Datapoint():
+    def map():
+        return
 
-    def __init__(self, x: np.float64, y: np.float64, number: int) -> None:
-        
-        self.x = x
+class Datapoint(Declarative_Base):
+    '''
+    Object-Relational-Mapper-Class to output the found functions and deviation form them for all the input test datapoints.
+    '''
+    __tablename__ = 'output_test'
 
-        self.y = y
+    x = Column(Double, primary_key=True)
+    y = Column(Double, primary_key=True)
+    function = Column(String(3))
+    deviation = Column(Double)
 
-        self.number = number
+    def in_range():
+        return
