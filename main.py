@@ -1,4 +1,4 @@
-import pwppa_classes as pwppa
+import output_tables as ot
 import numpy as np
 import pandas as pd
 import sqlalchemy as sql
@@ -122,7 +122,8 @@ def main():
                 by more than factor sqrt(2).
             If the test datapoint fits into this criteria, the datapoint, corresponding function and deviation from it
             are to be added to the test database table.
-    Step 4: It visualizes the data
+    Step 4: It visualizes the data using Bokeh.
+            The maximum deviation and accepted deviation range are displayed around the ideal functions line.
 
     Raises:
     - 
@@ -147,7 +148,7 @@ def main():
 
     # output tables
     # create all ORM-defined tables
-    pwppa.Declarative_Base.metadata.create_all(engine)
+    ot.Declarative_Base.metadata.create_all(engine)
 
     # Step 2
     # mapping between training datasets and ideal functions
@@ -159,7 +160,13 @@ def main():
     # create a new plot with a title and axis labels
     plt = figure(title='PWPPA Data Visualization', x_axis_label='x', y_axis_label='y')
 
-    colors = {'y1': RGB(r=128, g=128, b=0), 'y2': RGB(r=0, g=128, b=0), 'y3': RGB(r=128, g=0, b=128), 'y4': RGB(r=0, g=128, b=128)}
+    # create colors to base visualization colors off
+    colors = {
+            'y1': RGB(r=128, g=128, b=0),
+            'y2': RGB(r=0, g=128, b=0),
+            'y3': RGB(r=128, g=0, b=128),
+            'y4': RGB(r=0, g=128, b=128)
+            }
 
     # convert x-values of training data to np.array() for further calculation steps
     x_values = np.array(df_train['x']).reshape(-1, 1)
@@ -171,7 +178,7 @@ def main():
         if column != 'x':
 
             # create plain mapping instance to work on
-            train_ideal_mapping = pwppa.Train_Ideal_Mapping(training_data = column)
+            train_ideal_mapping = ot.Train_Ideal_Mapping(training_data = column)
 
             # get all the deviations for current training dataset and sort ascending by sqr_deviation
             deviation_mapping = get_deviations(df_train['x'], df_train[column], functions).sort_values(by = 'sqr_deviation')
@@ -247,13 +254,13 @@ def main():
     for test_index, test_datapoint in df_test.iterrows():
 
         # create plain Datapoint instance to work on
-        datapoint = pwppa.Datapoint(x = test_datapoint['x'], y = test_datapoint['y'], function = None, deviation = None)
+        datapoint = ot.Datapoint(x = test_datapoint['x'], y = test_datapoint['y'], function = None, deviation = None)
         datapoint_color = 'red'
         
         new_test_data = ''
 
         # check every ideal function
-        for mapping in session.query(pwppa.Train_Ideal_Mapping).all():
+        for mapping in session.query(ot.Train_Ideal_Mapping).all():
 
             # calculate functions estimated y value
             function_y = np.float64(functions[mapping.function_index].predict(np.array(datapoint.x).reshape(-1, 1)))
