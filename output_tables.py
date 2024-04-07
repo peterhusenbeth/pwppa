@@ -19,9 +19,6 @@ class Train_Ideal_Mapping(Declarative_Base):
     max_deviation = Column(Double)
     test_data = Column(String(10000))
 
-    def map():
-        return
-
 class Datapoint(Declarative_Base):
     '''
     Object-Relational-Mapper-Class to output the found functions and deviation form them for all the input test datapoints.
@@ -32,6 +29,3 @@ class Datapoint(Declarative_Base):
     y = Column(Double, primary_key=True)
     function = Column(String(3))
     deviation = Column(Double)
-
-    def in_range():
-        return

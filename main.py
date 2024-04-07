@@ -6,7 +6,7 @@ from sklearn.linear_model import LinearRegression
 from sqlalchemy.orm import sessionmaker
 from bokeh.plotting import figure, show
 from bokeh.colors import RGB
-from bokeh.models import Legend
+import unittests as tests
 
 def get_functions(df_x: pd.DataFrame, df_y: pd.DataFrame):
     '''
@@ -80,13 +80,13 @@ def get_deviations(df_x: pd.DataFrame, df_y: pd.DataFrame, functions: list[Linea
 
     return df_deviations
 
-def calc_deviations(x_data: pd.Series, y_data: pd.Series, function: LinearRegression):
+def calc_deviations(x_data: pd.DataFrame, y_data: pd.DataFrame, function: LinearRegression):
     '''
     Calculates the least-square- and max-deviation of the x/y-input data to the given function.
    
     Parameters:
-    - x_data (pd.Series): The x-axis of the data to be checked for its deviations.
-    - y_data (pd.Series): The y-axis of the data to be checked for its deviations.
+    - x_data (pd.DataFrame): The x-axis of the data to be checked for its deviations.
+    - y_data (pd.DataFrame): The y-axis of the data to be checked for its deviations.
     - function (LinearRegression): The function that the deviations will be calculated from.
 
     Returns:
@@ -96,12 +96,12 @@ def calc_deviations(x_data: pd.Series, y_data: pd.Series, function: LinearRegres
     Raises:
     - 
     '''
-    y_column = np.array(y_data).reshape(-1, 1)
-    y_estimated = function.predict(np.array(x_data).reshape(-1, 1))
+    y_column = np.array(y_data).reshape(-1)
+    y_estimated = function.predict(np.array(x_data).reshape(-1, 1)).reshape(-1)
     y_dev_abs = np.abs(y_column - y_estimated)
 
     # calculate square deviation
-    sqr_deviation = np.float64(sum((y_dev_abs)**2))
+    sqr_deviation = np.float64(np.sum((y_dev_abs)**2))
 
     # find maximum single deviation
     max_deviation = np.float64(y_dev_abs.max())
