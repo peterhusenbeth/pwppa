@@ -14,7 +14,6 @@ class Train_Ideal_Mapping(Declarative_Base):
 
     training_data = Column(String(3), primary_key=True)
     function = Column(String(3), primary_key=True)
-    function_index = Column(Integer)
     sqr_deviation = Column(Double)
     max_deviation = Column(Double)
     test_data = Column(String(10000))
